@@ -1,0 +1,7 @@
+setup.py
+iop/__init__.py
+iop/base.py
+iop_sdk_python.egg-info/PKG-INFO
+iop_sdk_python.egg-info/SOURCES.txt
+iop_sdk_python.egg-info/dependency_links.txt
+iop_sdk_python.egg-info/top_level.txt
