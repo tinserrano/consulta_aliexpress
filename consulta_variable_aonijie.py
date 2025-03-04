@@ -4,19 +4,19 @@ import json
 import time
 import os
 from datetime import datetime
-import variablesid
+import variablesid2
 from supabase import create_client
 
-def buscar_productos_completos(keywords, archivo_salida):
+def buscar_productos_completos(keywords, archivo_salida=None):
     # Configuración inicial
-    app_key = variablesid.app_key
-    app_secret = variablesid.app_secret
-    server_url = variablesid.server_url
+    app_key = variablesid2.app_key
+    app_secret = variablesid2.app_secret
+    server_url = variablesid2.server_url
 
     # Configuración de Supabase
-    supabase_url = variablesid.supabase_url
-    supabase_key = variablesid.supabase_key
-    supabase_table = variablesid.supabase_table
+    supabase_url = variablesid2.supabase_url
+    supabase_key = variablesid2.supabase_key
+    supabase_table = variablesid2.supabase_table
     
     # Inicializar cliente Supabase
     try:
@@ -130,7 +130,7 @@ def buscar_productos_completos(keywords, archivo_salida):
                     if total_count > total_productos:
                         current_page += 1
                         # Pequeña pausa para evitar límites de tasa de la API
-                        time.sleep(1)
+                        time.sleep(0.5)
                     else:
                         has_next_page = False
                         print(f"Todos los productos han sido recopilados ({total_productos} de {total_count})")
@@ -182,16 +182,20 @@ def buscar_productos_completos(keywords, archivo_salida):
             )
             df.drop('product_small_image_urls', axis=1, inplace=True)
         
-        # Verificar si el archivo ya existe para decidir si incluir encabezados
-        file_exists = os.path.isfile(archivo_salida)
-        
-        # Guardar en CSV (append si ya existe)
-        if file_exists:
-            df.to_csv(archivo_salida, mode='a', header=False, index=False)
-            print(f"Datos agregados al archivo existente: {archivo_salida}")
+        # Guardar en CSV solo si se proporcionó un archivo de salida
+        if archivo_salida is not None:
+            # Verificar si el archivo ya existe para decidir si incluir encabezados
+            file_exists = os.path.isfile(archivo_salida)
+            
+            # Guardar en CSV (append si ya existe)
+            if file_exists:
+                df.to_csv(archivo_salida, mode='a', header=False, index=False)
+                print(f"Datos agregados al archivo existente: {archivo_salida}")
+            else:
+                df.to_csv(archivo_salida, index=False)
+                print(f"Nuevo archivo creado: {archivo_salida}")
         else:
-            df.to_csv(archivo_salida, index=False)
-            print(f"Nuevo archivo creado: {archivo_salida}")
+            print("No se especificó archivo de salida. Omitiendo guardado en CSV.")
         
         # SUBIR A SUPABASE
         print("\nIniciando carga de datos a Supabase...")
@@ -270,9 +274,10 @@ def buscar_productos_completos(keywords, archivo_salida):
         print(f"Búsqueda completada. Se encontraron {total_productos} productos en total.")
         
         # Mostrar información de las columnas guardadas
-        print("\nCampos guardados en el archivo CSV y en Supabase:")
+        print("\nCampos guardados en Supabase:")
         for col in df.columns:
-            print(f"- {col}")
+            if col in columnas_existentes:
+                print(f"- {col}")
         
         return df
     else:
@@ -280,8 +285,8 @@ def buscar_productos_completos(keywords, archivo_salida):
         return None
 
 # Para uso con cron, puedes configurar los parámetros directamente
-keyword = "aonijie"  # Palabra clave a buscar
-archivo_salida = "adidasar_historico.csv"  # Nombre del archivo para guardar el historial
+keyword = "adidasdadidasar"  # Palabra clave a buscar
+archivo_salida = None  # Nombre del archivo para guardar el historial
 
 # Bloque principal para ejecutar el script
 if __name__ == "__main__":
